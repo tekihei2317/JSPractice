@@ -5,16 +5,10 @@
   let util = null;
   let ctx = null;
   let image = null;
-  let startTime = null;
-
-  let viperX = CANVAS_WIDTH / 2;
-  let viperY = CANVAS_HEIGHT / 2;
-
   /**
-   * @type {boolean} - 登場シーンかどうかを表すフラグ
+   * @type {Viper}
    */
-  let isComing = false;
-  let comingStartTime = null;
+  let viper = null;
 
   /**
    * ページのロード完了時に実行
@@ -28,7 +22,6 @@
       image = loadedImage;
       initialize();
       eventSetting();
-      startTime = Date.now();
       render();
     });
   });
@@ -40,10 +33,13 @@
     canvas.width = CANVAS_WIDTH;
     canvas.height = CANVAS_HEIGHT;
 
-    isComing = true;
-    comingStartTime = Date.now();
-    viperX = CANVAS_WIDTH / 2;
-    viperY = CANVAS_HEIGHT;
+    viper = new Viper(ctx, 0, 0, image);
+    viper.setComingScene(
+      CANVAS_WIDTH / 2,
+      CANVAS_HEIGHT,
+      CANVAS_WIDTH / 2,
+      CANVAS_HEIGHT - 100
+    );
   }
 
   /**
@@ -52,15 +48,15 @@
   function eventSetting() {
     window.addEventListener("keydown", (event) => {
       // 登場シーンなら何もしない
-      if (isComing === true) return;
+      if (viper.isComing === true) return;
       if (event.key === "ArrowLeft") {
-        viperX -= 10;
+        viper.position.x -= 10;
       } else if (event.key === "ArrowRight") {
-        viperX += 10;
+        viper.position.x += 10;
       } else if (event.key === "ArrowUp") {
-        viperY -= 10;
+        viper.position.y -= 10;
       } else if (event.key === "ArrowDown") {
-        viperY += 10;
+        viper.position.y += 10;
       }
     });
   }
@@ -69,24 +65,25 @@
    * 描画処理を行う
    */
   function render() {
+    //console.log('hoge');
     // 描画前に全体をグレーで塗りつぶす
+    ctx.globalAlpha = 1.0;
     util.drawRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT, "#eee");
 
-    // 登場シーンの処理
-    if (isComing === true) {
-      let erapsedTime = (Date.now() - comingStartTime) / 1000;
-      viperY = CANVAS_HEIGHT - erapsedTime * 50;
-
-      // 一定の一に到達したら登場シーンを終了する
-      if (viperY <= CANVAS_HEIGHT - 200) {
-        isComing = false;
+    if (viper.isComing === true) {
+      // 秒速50px
+      const elapsedTime = (Date.now() - viper.comingStartTime) / 1000;
+      const nextY = CANVAS_HEIGHT - 50 * elapsedTime;
+      viper.position.set(viper.position.x, nextY);
+      if (viper.position.y <= viper.comingEndPosition.y) {
+        viper.isComing = false;
       }
-      // (大体)50msごとに点滅させる
+
+      // 大体50msごとに点滅させる
       if (Date.now() % 100 < 50) ctx.globalAlpha = 0.5;
-      else ctx.globalAlpha = 1.0;
     }
 
-    ctx.drawImage(image, viperX, viperY);
+    viper.draw();
     requestAnimationFrame(render);
   }
 })();
