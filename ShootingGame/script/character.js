@@ -54,6 +54,11 @@ class Viper extends Character {
     this.isComing = false;
     this.comingStartTime = null;
     /**
+     * 登場が開始する場所の座標
+     * @type {position}
+     */
+    this.comingStartPosition = null;
+    /**
      * 登場が完了する場所の座標
      * @type {position}
      */
@@ -71,6 +76,28 @@ class Viper extends Character {
     this.isComing = true;
     this.comingStartTime = Date.now();
     this.position.set(startX, startY);
+    this.comingStartPosition = new Position(startX, startY);
     this.comingEndPosition = new Position(endX, endY);
+  }
+
+  /**
+   * 登場シーンの位置の更新と描画
+   */
+  update() {
+    if (this.isComing === true) {
+      // 秒速50px
+      const elapsedTime = (Date.now() - this.comingStartTime) / 1000;
+      const nextY = this.comingStartPosition.y - 50 * elapsedTime;
+      this.position.set(this.position.x, nextY);
+      if (this.position.y <= this.comingEndPosition.y) {
+        this.isComing = false;
+      }
+      // 大体50msごとに点滅させる
+      this.ctx.globalAlpha = (Date.now() % 100 < 50 ? 0.5 : 1.0);
+      this.draw();
+    } else {
+      this.ctx.globalAlpha = 1.0;
+      this.draw();
+    }
   }
 }

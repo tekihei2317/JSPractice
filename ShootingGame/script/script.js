@@ -67,23 +67,8 @@
   function render() {
     //console.log('hoge');
     // 描画前に全体をグレーで塗りつぶす
-    ctx.globalAlpha = 1.0;
     util.drawRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT, "#eee");
-
-    if (viper.isComing === true) {
-      // 秒速50px
-      const elapsedTime = (Date.now() - viper.comingStartTime) / 1000;
-      const nextY = CANVAS_HEIGHT - 50 * elapsedTime;
-      viper.position.set(viper.position.x, nextY);
-      if (viper.position.y <= viper.comingEndPosition.y) {
-        viper.isComing = false;
-      }
-
-      // 大体50msごとに点滅させる
-      if (Date.now() % 100 < 50) ctx.globalAlpha = 0.5;
-    }
-
-    viper.draw();
+    viper.update();
     requestAnimationFrame(render);
   }
 })();
