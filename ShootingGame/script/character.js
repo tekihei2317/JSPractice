@@ -108,10 +108,18 @@ class Viper extends Character {
       this.draw();
     } else {
       this.ctx.globalAlpha = 1.0;
-      if (window.isKeyDown.key_ArrowLeft === true) this.position.x -= this.speed;
-      if (window.isKeyDown.key_ArrowRight === true) this.position.x += this.speed;
-      if (window.isKeyDown.key_ArrowUp === true) this.position.y -= this.speed;
-      if (window.isKeyDown.key_ArrowDown === true) this.position.y += this.speed;
+
+      let nextX = this.position.x;
+      let nextY = this.position.y;
+      if (window.isKeyDown.key_ArrowLeft === true) nextX -= this.speed;
+      if (window.isKeyDown.key_ArrowRight === true) nextX += this.speed;
+      if (window.isKeyDown.key_ArrowUp === true) nextY -= this.speed;
+      if (window.isKeyDown.key_ArrowDown === true) nextY += this.speed;
+
+      // clamp
+      nextX = Math.min(this.ctx.canvas.width - this.width / 2, Math.max(this.width / 2, nextX));
+      nextY = Math.min(this.ctx.canvas.height - this.height / 2, Math.max(this.height / 2, nextY));
+      this.position.set(nextX, nextY);
       this.draw();
     }
   }
