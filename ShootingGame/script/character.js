@@ -19,12 +19,16 @@ class Character {
    * @param {CanvasRenderingContext2D} ctx - 描画に利用する2Dコンテキスト
    * @param {number} x - x座標
    * @param {number} y - y座標
+   * @param {number} w - 横の長さ
+   * @param {number} h - 縦の長さ
    * @param {number} life - キャラクターのライフ
    * @param {Image} image - キャラクターの画像
    */
-  constructor(ctx, x, y, life, image) {
+  constructor(ctx, x, y, w, h, life, image) {
     this.ctx = ctx;
     this.position = new Position(x, y);
+    this.width = w;
+    this.height = h;
     this.life = life;
     this.image = image;
   }
@@ -33,7 +37,7 @@ class Character {
    * キャラクターを描画する
    */
   draw() {
-    this.ctx.drawImage(this.image, this.position.x, this.position.y);
+    this.ctx.drawImage(this.image, this.position.x - this.width / 2, this.position.y - this.height / 2);
   }
 }
 
@@ -43,10 +47,13 @@ class Viper extends Character {
    * @param {CanvasRenderingContext2D} ctx 
    * @param {number} x 
    * @param {number} y 
+   * @param {number} w
+   * @param {number} h
    * @param {Image} image 
    */
-  constructor(ctx, x, y, image) {
-    super(ctx, x, y, 0, image);
+  constructor(ctx, x, y, w, h, image) {
+    super(ctx, x, y, w, h, 0, image);
+
     /**
      * viperが登場中かどうかを表すフラグ
      * @type {boolean}

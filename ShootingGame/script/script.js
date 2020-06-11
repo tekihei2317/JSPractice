@@ -33,7 +33,7 @@
     canvas.width = CANVAS_WIDTH;
     canvas.height = CANVAS_HEIGHT;
 
-    viper = new Viper(ctx, 0, 0, image);
+    viper = new Viper(ctx, 0, 0, 64, 64, image);
     viper.setComingScene(
       CANVAS_WIDTH / 2,
       CANVAS_HEIGHT,
