@@ -31,6 +31,16 @@ class Character {
     this.height = h;
     this.life = life;
     this.ready = false;
+    /**
+     * キャラクターの角度)
+     * @type {number}
+     */
+    this.angle = 270 * Math.PI / 180;
+    /**
+     * 進行方向を表すベクトル
+     * @type {Position}
+     */
+    this.direction = new Position(0, -1.0);
 
     this.image = new Image();
     this.image.addEventListener('load', () => {
@@ -43,7 +53,34 @@ class Character {
    * キャラクターを描画する
    */
   draw() {
-    this.ctx.drawImage(this.image, this.position.x - this.width / 2, this.position.y - this.height / 2);
+    this.ctx.drawImage(
+      this.image,
+      this.position.x - this.width / 2,
+      this.position.y - this.height / 2
+    );
+  }
+
+  /**
+   * 角度を考慮して画像を描画する
+   */
+  rotationDraw() {
+    this.ctx.save();
+    this.ctx.translate(this.position.x, this.position.y);
+    // 適切に座標軸を回転させる
+    this.ctx.rotate(this.angle - Math.PI * 1.5);
+
+    this.ctx.drawImage(this.image, -this.width / 2, -this.height / 2, this.width, this.height);
+    // 座標系を元に戻す
+    this.ctx.restore();
+  }
+
+  /**
+   * キャラクターの角度(ラジアン)と方向を設定する
+   * @param {number} rad  
+   */
+  setAngleAndDirection(rad) {
+    this.angle = rad;
+    this.direction = new Position(Math.cos(rad), Math.sin(rad));
   }
 }
 
@@ -142,6 +179,7 @@ class Viper extends Character {
     } else {
       this.ctx.globalAlpha = 1.0;
 
+      // キーの押下状態に応じて移動させる
       let nextX = this.position.x;
       let nextY = this.position.y;
       if (window.isKeyDown.key_ArrowLeft === true) nextX -= this.speed;
@@ -164,12 +202,17 @@ class Viper extends Character {
           break;
         }
 
-        console.log(this.singleShotArray.length);
+        // console.log(this.singleShotArray.length);()
         for (let i = 0; i < this.singleShotArray.length; i += 2) if (this.singleShotArray[i].life <= 0) {
           this.singleShotArray[i].set(this.position.x, this.position.y);
-          this.singleShotArray[i].setVector(-0.2, -0.9);
+
+          /**
+           * @type {number} - シングルショットを傾ける角度
+           */
+          const diffRad = 10 * Math.PI / 180;
+          this.singleShotArray[i].setAngleAndDirection(Math.PI * 1.5 + diffRad);
           this.singleShotArray[i + 1].set(this.position.x, this.position.y);
-          this.singleShotArray[i + 1].setVector(0.2, -0.9);
+          this.singleShotArray[i + 1].setAngleAndDirection(Math.PI * 1.5 - diffRad);
           break;
         }
       }
@@ -181,12 +224,7 @@ class Viper extends Character {
 class Shot extends Character {
   constructor(ctx, x, y, w, h, imagePath) {
     super(ctx, x, y, w, h, 0, imagePath);
-    this.speed = 7;
-    /**
-     * 進行方向を表すベクトル
-     * @type {Position}
-     */
-    this.direction = new Position(0, -1.0);
+    this.speed = 12;
   }
 
   /**
@@ -199,22 +237,13 @@ class Shot extends Character {
     this.life = 1;
   }
 
-  /**
-   * ショットの進行方向を設定する
-   * @param {number} x 
-   * @param {number} y 
-   */
-  setVector(x, y) {
-    this.direction.set(x, y);
-  }
-
   update() {
     // ライフが0以下の場合は描画しない
     if (this.life <= 0) return;
 
     this.position.x += this.speed * this.direction.x;
     this.position.y += this.speed * this.direction.y;
-    this.draw();
+    this.rotationDraw();
 
     // 画面外に移動したらライフを0にする
     if (this.position.y + this.height < 0) this.life = 0;
