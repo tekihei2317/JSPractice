@@ -20,6 +20,7 @@
 
   const SHOT_MAX_COUNT = 10;
   let shotArray = [];
+  let singleShotArray = [];
 
   /**
    * ページのロード完了時に実行
@@ -50,8 +51,10 @@
 
     for (let i = 0; i < SHOT_MAX_COUNT; i++) {
       shotArray[i] = new Shot(ctx, 0, 0, 32, 32, "image/viper_shot.png");
+      singleShotArray[i * 2 + 0] = new Shot(ctx, 0, 0, 32, 32, "image/viper_single_shot.png");
+      singleShotArray[i * 2 + 1] = new Shot(ctx, 0, 0, 32, 32, "image/viper_single_shot.png");
     }
-    viper.setShotArray(shotArray);
+    viper.setShotArray(shotArray, singleShotArray);
   }
 
   /**
@@ -59,12 +62,16 @@
    */
   function startGame() {
     let ready = true;
+
     ready = ready && viper.ready;
     shotArray.map((v) => {
       ready = ready && v.ready;
     });
+    singleShotArray.map((v) => {
+      ready = ready && v.ready;
+    });
 
-    console.log(ready);
+    console.log(ready === true ? "ready" : "not ready");
     if (ready === true) {
       eventSetting();
       render();
@@ -93,10 +100,14 @@
     //console.log('hoge');
     // 描画前に全体をグレーで塗りつぶす
     util.drawRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT, "#eee");
+
     viper.update();
     shotArray.map((v) => {
       v.update();
     });
+    singleShotArray.map((v) => {
+      v.update();
+    })
     requestAnimationFrame(render);
   }
 })();

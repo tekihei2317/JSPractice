@@ -85,6 +85,10 @@ class Viper extends Character {
      */
     this.shotArray = null;
     /**
+     * @type {Array<Shot>}
+     */
+    this.singleShotArray = null;
+    /**
      * ショットを撃つことが出来る間隔(フレーム数)
      * @type {number}
      */
@@ -115,8 +119,9 @@ class Viper extends Character {
    * ショットを設定する
    * @param {Array<Shot>} shotArray 
    */
-  setShotArray(shotArray) {
+  setShotArray(shotArray, singleShotArray) {
     this.shotArray = shotArray;
+    this.singleShotArray = singleShotArray;
   }
 
   /**
@@ -150,12 +155,21 @@ class Viper extends Character {
       this.position.set(nextX, nextY);
       this.draw();
 
-      // キーが押されていた場合ショットを一つ生成する(カウンタが0のとき=10フレームごと)
+      // キーが押されていた場合ショットを生成する(カウンタが0のとき=10フレームごと)
       if (window.isKeyDown.key_z === true && this.shotCheckCounter === 0) {
 
         for (let i = 0; i < this.shotArray.length; i++) if (this.shotArray[i].life <= 0) {
           this.shotArray[i].set(this.position.x, this.position.y);
           // console.log(this.shotArray[i].position.x);
+          break;
+        }
+
+        console.log(this.singleShotArray.length);
+        for (let i = 0; i < this.singleShotArray.length; i += 2) if (this.singleShotArray[i].life <= 0) {
+          this.singleShotArray[i].set(this.position.x, this.position.y);
+          this.singleShotArray[i].setVector(-0.2, -0.9);
+          this.singleShotArray[i + 1].set(this.position.x, this.position.y);
+          this.singleShotArray[i + 1].setVector(0.2, -0.9);
           break;
         }
       }
@@ -168,6 +182,11 @@ class Shot extends Character {
   constructor(ctx, x, y, w, h, imagePath) {
     super(ctx, x, y, w, h, 0, imagePath);
     this.speed = 7;
+    /**
+     * 進行方向を表すベクトル
+     * @type {Position}
+     */
+    this.direction = new Position(0, -1.0);
   }
 
   /**
@@ -180,12 +199,23 @@ class Shot extends Character {
     this.life = 1;
   }
 
+  /**
+   * ショットの進行方向を設定する
+   * @param {number} x 
+   * @param {number} y 
+   */
+  setVector(x, y) {
+    this.direction.set(x, y);
+  }
+
   update() {
     // ライフが0以下の場合は描画しない
     if (this.life <= 0) return;
 
-    this.position.y -= this.speed;
+    this.position.x += this.speed * this.direction.x;
+    this.position.y += this.speed * this.direction.y;
     this.draw();
+
     // 画面外に移動したらライフを0にする
     if (this.position.y + this.height < 0) this.life = 0;
   }
