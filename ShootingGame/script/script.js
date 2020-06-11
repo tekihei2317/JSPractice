@@ -1,4 +1,11 @@
 (() => {
+  /**
+   * キーの押下状態を調べるためのオブジェクト
+   * @global
+   * @type {object}
+   */
+  window.isKeyDown = {};
+
   const CANVAS_WIDTH = 640;
   const CANVAS_HEIGHT = 480;
 
@@ -47,17 +54,10 @@
    */
   function eventSetting() {
     window.addEventListener("keydown", (event) => {
-      // 登場シーンなら何もしない
-      if (viper.isComing === true) return;
-      if (event.key === "ArrowLeft") {
-        viper.position.x -= 10;
-      } else if (event.key === "ArrowRight") {
-        viper.position.x += 10;
-      } else if (event.key === "ArrowUp") {
-        viper.position.y -= 10;
-      } else if (event.key === "ArrowDown") {
-        viper.position.y += 10;
-      }
+      isKeyDown[`key_${event.key}`] = true;
+    });
+    window.addEventListener("keyup", (event) => {
+      isKeyDown[`key_${event.key}`] = false;
     });
   }
 
