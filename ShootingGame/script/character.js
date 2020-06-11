@@ -84,6 +84,16 @@ class Viper extends Character {
      * @type {Array<Shot>}
      */
     this.shotArray = null;
+    /**
+     * ショットを撃つことが出来る間隔(フレーム数)
+     * @type {number}
+     */
+    this.shotInterval = 10;
+    /**
+     * ショットが撃てるかどうかを確認するためのカウンター
+     * @type {number}
+     */
+    this.shotCheckCounter = 0;
   }
 
   /**
@@ -140,14 +150,16 @@ class Viper extends Character {
       this.position.set(nextX, nextY);
       this.draw();
 
-      // キーが押されていた場合ショットを一つ生成する
-      if (window.isKeyDown.key_z === true) {
+      // キーが押されていた場合ショットを一つ生成する(カウンタが0のとき=10フレームごと)
+      if (window.isKeyDown.key_z === true && this.shotCheckCounter === 0) {
+
         for (let i = 0; i < this.shotArray.length; i++) if (this.shotArray[i].life <= 0) {
           this.shotArray[i].set(this.position.x, this.position.y);
           // console.log(this.shotArray[i].position.x);
           break;
         }
       }
+      this.shotCheckCounter = (this.shotCheckCounter + 1) % this.shotInterval;
     }
   }
 }
