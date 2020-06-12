@@ -150,7 +150,7 @@
         }
       }
       // 100フレームごとに再実行する
-      if (scene.frame === 100) {
+      if (scene.frame === 10) {
         scene.use('invade');
       }
     })

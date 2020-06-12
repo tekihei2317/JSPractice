@@ -267,6 +267,7 @@ class Shot extends Character {
 
     // 画面外に移動したらライフを0にする
     if (this.position.y + this.height < 0) this.life = 0;
+    if (this.position.y - this.height > this.ctx.canvas.height) this.life = 0;
   }
 }
 
