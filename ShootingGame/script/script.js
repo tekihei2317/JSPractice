@@ -26,6 +26,12 @@
   let enemyArray = [];
 
   /**
+   * シーンマネージャー
+   * @type {SceneManager}
+   */
+  let scene = null;
+
+  /**
    * ページのロード完了時に実行
    */
   window.addEventListener("load", () => {
@@ -43,6 +49,9 @@
   function initialize() {
     canvas.width = CANVAS_WIDTH;
     canvas.height = CANVAS_HEIGHT;
+
+    // シーンを初期化する
+    scene = new SceneManager();
 
     // 自機を初期化
     viper = new Viper(ctx, 0, 0, 64, 64, "image/viper.png");
@@ -87,6 +96,7 @@
     console.log(ready === true ? "ready" : "not ready");
     if (ready === true) {
       eventSetting();
+      sceneSetting();
       render();
     } else {
       // 100msごとに再実行する
@@ -106,11 +116,35 @@
     });
   }
 
+  function sceneSetting() {
+    // イントロシーン
+    scene.add('intro', (time) => {
+      if (time > 2.0) {
+        scene.use('invade');
+      }
+    });
+
+    // invadeシーン
+    scene.add('invade', (time) => {
+      if (scene.frame !== 0) return;
+
+      // 敵を配置する
+      for (let i = 0; i < ENEMY_MAX_COUNT; i++) if (enemyArray[i].life <= 0) {
+        let enemy = enemyArray[i];
+        enemyArray.set(canvas_WIDTH / 2, -enemy.height);
+        enemy.setVector(0.0, 1.0);
+        break;
+      }
+    })
+    // 最初はintroシーンを設定する
+    scene.use('intro');
+
+  }
+
   /**
    * 描画処理を行う
    */
   function render() {
-    //console.log('hoge');
     // 描画前に全体をグレーで塗りつぶす
     util.drawRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT, "#eee");
 
