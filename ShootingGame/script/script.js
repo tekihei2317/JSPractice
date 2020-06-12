@@ -100,6 +100,8 @@
     // 敵キャラクターのショットを初期化
     for (let i = 0; i < ENEMY_SHOT_MAX_COUNT; i++) {
       enemyShotArray[i] = new Shot(ctx, 0, 0, 32, 32, "image/enemy_shot.png");
+      enemyShotArray[i].setTargets([viper]);
+      enemyShotArray[i].setExplosions(explosionArray);
     }
   }
 
@@ -162,7 +164,7 @@
         // 敵を配置する
         for (let i = 0; i < ENEMY_MAX_COUNT; i++) if (enemyArray[i].life <= 0) {
           let enemy = enemyArray[i];
-          enemy.set(CANVAS_WIDTH / 2, -enemy.height, 2, 'default');
+          enemy.set(CANVAS_WIDTH * (1 / 6) + CANVAS_WIDTH * (2 / 3) * Math.random(), -enemy.height, 2, 'default');
           enemy.setDirection(0.0, 1.0);
           break;
         }

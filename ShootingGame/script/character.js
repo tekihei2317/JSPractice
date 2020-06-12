@@ -162,6 +162,7 @@ class Viper extends Character {
    * @param {number} endY 
    */
   setComingScene(startX, startY, endX, endY) {
+    this.life = 1;
     this.isComing = true;
     this.comingStartTime = Date.now();
     this.position.set(startX, startY);
@@ -182,6 +183,7 @@ class Viper extends Character {
    * 登場シーンの位置の更新と描画
    */
   update() {
+    if (this.life === 0) return;
     if (this.isComing === true) {
       // 秒速50px
       const elapsedTime = (Date.now() - this.comingStartTime) / 1000;
@@ -242,7 +244,7 @@ class Viper extends Character {
 class Shot extends Character {
   constructor(ctx, x, y, w, h, imagePath) {
     super(ctx, x, y, w, h, 0, imagePath);
-    this.speed = 12;
+    this.speed = 7;
     /**
      * 自身の攻撃力
      * @type {number}
@@ -313,7 +315,7 @@ class Shot extends Character {
   }
 
   update() {
-    // ライフが0以下の場合は描画しない
+    // ライフが0以下の場合は描画しない(無視する)
     if (this.life <= 0) return;
 
     this.position.x += this.speed * this.direction.x;
@@ -328,6 +330,10 @@ class Shot extends Character {
       // 衝突判定をする(アバウト?)
       if (dist <= (this.width + v.width) / 4) {
         console.log('collision occured!');
+        if (v instanceof Viper === true) {
+          // 登場シーンの場合は衝突判定を行わないz
+          if (v.isComing === true) return;
+        }
         v.life -= this.power;
         // ライフが0以下になったら爆発エフェクトを生成する
         if (v.life <= 0) {
