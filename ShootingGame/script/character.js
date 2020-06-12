@@ -262,6 +262,11 @@ class Enemy extends Character {
   constructor(ctx, x, y, w, h, imagePath) {
     super(ctx, x, y, w, h, 0, imagePath);
     this.speed = 3;
+    /**
+     * 自身が持つショットの配列
+     * @type {Array<Shot>}
+     */
+    this.shotArray = null;
   }
 
   /**
@@ -273,6 +278,14 @@ class Enemy extends Character {
   set(x, y, life = 1) {
     this.position.set(x, y);
     this.life = life;
+  }
+
+  /**
+   * ショットを設定する
+   * @param {Array<Shot>} shotArray 
+   */
+  setShotArray(shotArray) {
+    this.shotArray = shotArray;
   }
 
   update() {

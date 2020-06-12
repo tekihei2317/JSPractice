@@ -45,7 +45,7 @@ class SceneManager {
     let activeTime = (Date.now() - this.startTime) / 1000;
     // 経過時間を引数に与えて処理を行う
     this.activeScene(activeTime);
+    // 関数実行してからframeインクリメントしてるのに関数側ではframeが0から始まってる(非同期だから?)
     this.frame++;
-    // console.log(this.frame);
   }
 }

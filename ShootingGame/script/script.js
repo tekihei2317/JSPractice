@@ -23,7 +23,9 @@
   let singleShotArray = [];
 
   const ENEMY_MAX_COUNT = 10;
+  const ENEMY_SHOT_MAX_COUNT = 50;
   let enemyArray = [];
+  let enemyShotArray = [];
 
   /**
    * シーンマネージャー
@@ -70,10 +72,17 @@
     }
     viper.setShotArray(shotArray, singleShotArray);
 
-    // 敵キャラクターを初期化
+    // 敵キャラクターのショットを初期化
+    for (let i = 0; i < ENEMY_SHOT_MAX_COUNT; i++) {
+      enemyShotArray[i] = new Shot(ctx, 0, 0, 32, 32, "image/enemy_shot.png");
+    }
+
+    // 敵キャラクターを初期化(ショットは共有する)
     for (let i = 0; i < ENEMY_MAX_COUNT; i++) {
       enemyArray[i] = new Enemy(ctx, 0, 0, 48, 48, "image/enemy_small.png");
+      enemyArray[i].setShotArray(enemyShotArray);
     }
+
   }
 
   /**
@@ -121,25 +130,30 @@
     scene.add('intro', (time) => {
       if (time > 2.0) {
         scene.use('invade');
-        console.log('using invade scene');
+        console.log('switch to invade scene');
       }
     });
 
     // invadeシーン
     scene.add('invade', (time) => {
-      if (scene.frame !== 0) return;
-
-      // 敵を配置する
-      for (let i = 0; i < ENEMY_MAX_COUNT; i++) if (enemyArray[i].life <= 0) {
-        let enemy = enemyArray[i];
-        enemy.set(CANVAS_WIDTH / 2, -enemy.height);
-        enemy.setDirection(0.0, 1.0);
-        break;
+      // console.log(scene.frame);
+      if (scene.frame === 0) {
+        // 敵を配置する
+        for (let i = 0; i < ENEMY_MAX_COUNT; i++) if (enemyArray[i].life <= 0) {
+          let enemy = enemyArray[i];
+          enemy.set(CANVAS_WIDTH / 2, -enemy.height);
+          enemy.setDirection(0.0, 1.0);
+          break;
+        }
+      }
+      // 100フレームごとに再実行する
+      if (scene.frame === 100) {
+        scene.use('invade');
       }
     })
     // 最初はintroシーンを設定する
     scene.use('intro');
-    console.log('using intro scene');
+    console.log('switch to intro scene');
   }
 
   /**
