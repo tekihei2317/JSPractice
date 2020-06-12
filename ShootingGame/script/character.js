@@ -491,7 +491,7 @@ class Explosion {
     this.ctx.globalAlpha = 0.5;
 
     let time = (Date.now() - this.startTime) / 1000;
-    let progress = simpleEaseOut(Math.min(time / this.timeRange), 1.0);
+    let progress = simpleEaseOut(Math.min(time / this.timeRange, 1.0));
 
     let d = this.radius * progress;
 
