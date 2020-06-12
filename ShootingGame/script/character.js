@@ -253,6 +253,11 @@ class Shot extends Character {
      * @type {Array<Character>}
      */
     this.targetArray = [];
+    /**
+     * 爆発エフェクトのインスタンスを格納
+     * @type {Array<Explosion>}
+     */
+    this.explosionArray = [];
   }
 
   /**
@@ -297,6 +302,16 @@ class Shot extends Character {
     }
   }
 
+  /**
+   * ショットが爆発エフェクトを発生できるよう設定する
+   * @param {Array<Explosion} targets 
+   */
+  setExplosions(targets) {
+    if (targets != null && Array.isArray(targets) === true && targets.length > 0) {
+      this.explosionArray = targets;
+    }
+  }
+
   update() {
     // ライフが0以下の場合は描画しない
     if (this.life <= 0) return;
@@ -314,6 +329,13 @@ class Shot extends Character {
       if (dist <= (this.width + v.width) / 4) {
         console.log('collision occured!');
         v.life -= this.power;
+        // ライフが0以下になったら爆発エフェクトを生成する
+        if (v.life <= 0) {
+          for (let i = 0; i < this.explosionArray.length; i++) if (this.explosionArray[i].life !== true) {
+            this.explosionArray[i].set(v.position.x, v.position.y);
+            break;
+          }
+        }
         this.life = 0;
       }
     });
@@ -401,5 +423,73 @@ class Enemy extends Character {
       this.shotArray[i].setDirection(x, y);
       break;
     }
+  }
+}
+
+/**
+ * 爆発エフェクトクラス
+ */
+class Explosion {
+  /**
+   * @constructor
+   * @param {CanvasRenderingContext2D} ctx - 描画に利用するコンテキスト
+   * @param {number} radius - 爆発の広がりの半径
+   * @param {number} count - 爆発の火花の数
+   * @param {number} size - 爆発の火花の大きさ
+   * @param {number} timeRange  - 爆発が消えるまでの時間(秒)
+   * @param {string} color - 爆発の色
+   */
+  constructor(ctx, radius, count, size, timeRange, color = "#ff1166") {
+    this.ctx = ctx;
+    this.life = false;
+    this.color = color;
+    this.position = null;
+    this.radius = radius;
+    this.count = count;
+    this.startTime = 0;
+    this.timeRange = timeRange;
+    this.fireSize = size;
+    /**
+     * 火花の位置を格納する
+     * @type {Array<Position>}
+     */
+    this.firePosition = [];
+    /**
+     * 火花の進行方向を格納する
+     * @type {Array<Position>}
+     */
+    this.fireVector = [];
+  }
+
+  set(x, y) {
+    for (let i = 0; i < this.count; i++) {
+      this.firePosition[i] = new Position(x, y);
+      let r = Math.random() * Math.PI * 2.0;
+      this.fireVector[i] = new Position(Math.cos(r), Math.sin(r));
+    }
+    this.life = true;
+    this.startTime = Date.now();
+  }
+
+  update() {
+    if (this.life !== true) return;
+    this.ctx.fillStyle = this.color;
+    this.ctx.globalAlpha = 0.5;
+
+    let time = (Date.now() - this.startTime) / 1000;
+    let progress = Math.min(time / this.timeRange, 1.0);
+    let d = this.radius * progress;
+
+    for (let i = 0; i < this.firePosition.length; i++) {
+      let x = this.firePosition[i].x + d * this.fireVector[i].x;
+      let y = this.firePosition[i].y + d * this.fireVector[i].y;
+      this.ctx.fillRect(
+        x - this.fireSize / 2,
+        y - this.fireSize / 2,
+        this.fireSize,
+        this.fireSize
+      );
+    }
+    if (progress >= 1.0) this.life = false;
   }
 }

@@ -33,6 +33,10 @@
    */
   let scene = null;
 
+  // 爆発エフェクト
+  const EXPLOSION_MAX_COUNT = 10;
+  let explosionArray = [];
+
   /**
    * ページのロード完了時に実行
    */
@@ -70,6 +74,11 @@
       enemyArray[i].setShotArray(enemyShotArray);
     }
 
+    // 爆発エフェクトを初期化
+    for (let i = 0; i < EXPLOSION_MAX_COUNT; i++) {
+      explosionArray[i] = new Explosion(ctx, 50, 15, 30, 0.25);
+    }
+
     // ショットを初期化
     for (let i = 0; i < SHOT_MAX_COUNT; i++) {
       shotArray[i] = new Shot(ctx, 0, 0, 32, 32, "image/viper_shot.png");
@@ -80,6 +89,11 @@
       shotArray[i].setTargets(enemyArray);
       singleShotArray[i * 2 + 0].setTargets(enemyArray);
       singleShotArray[i * 2 + 1].setTargets(enemyArray);
+
+      // 爆発エフェクトを設定
+      shotArray[i].setExplosions(explosionArray);
+      singleShotArray[i * 2 + 0].setExplosions(explosionArray);
+      singleShotArray[i * 2 + 1].setExplosions(explosionArray);
     }
     viper.setShotArray(shotArray, singleShotArray);
 
@@ -87,8 +101,6 @@
     for (let i = 0; i < ENEMY_SHOT_MAX_COUNT; i++) {
       enemyShotArray[i] = new Shot(ctx, 0, 0, 32, 32, "image/enemy_shot.png");
     }
-
-
   }
 
   /**
@@ -169,11 +181,11 @@
    * 描画処理を行う
    */
   function render() {
+    ctx.globalAlpha = 1.0;
     // 描画前に全体をグレーで塗りつぶす
     util.drawRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT, "#eee");
 
     scene.update();
-
     viper.update();
     shotArray.map((v) => {
       v.update();
@@ -187,6 +199,10 @@
     enemyShotArray.map((v) => {
       v.update();
     })
+    explosionArray.map((v) => {
+      v.update();
+    });
+
     requestAnimationFrame(render);
   }
 })();
