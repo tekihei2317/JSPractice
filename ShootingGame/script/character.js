@@ -435,7 +435,7 @@ class Explosion {
    * @param {CanvasRenderingContext2D} ctx - 描画に利用するコンテキスト
    * @param {number} radius - 爆発の広がりの半径
    * @param {number} count - 爆発の火花の数
-   * @param {number} size - 爆発の火花の大きさ
+   * @param {number} size - 爆発の火花の大きさの最大値
    * @param {number} timeRange  - 爆発が消えるまでの時間(秒)
    * @param {string} color - 爆発の色
    */
@@ -448,7 +448,16 @@ class Explosion {
     this.count = count;
     this.startTime = 0;
     this.timeRange = timeRange;
-    this.fireSize = size;
+    /**
+     * 爆発の火花の大きさの最大値
+     * @type {number}
+     */
+    this.fireBaseSize = size;
+    /**
+     * 火花の大きさを格納する
+     * @type {Array<number>}
+     */
+    this.fireSize = [];
     /**
      * 火花の位置を格納する
      * @type {Array<Position>}
@@ -464,8 +473,13 @@ class Explosion {
   set(x, y) {
     for (let i = 0; i < this.count; i++) {
       this.firePosition[i] = new Position(x, y);
+      // fireBaseSize*0.5~fireBaseSize*1.0 の範囲に収まる
+      this.fireSize[i] = (0.5 + Math.random() * 0.5) * this.fireBaseSize;
+
       let r = Math.random() * Math.PI * 2.0;
-      this.fireVector[i] = new Position(Math.cos(r), Math.sin(r));
+      // 進行方向ベクトルの長さをランダムにする
+      let len = Math.random();
+      this.fireVector[i] = new Position(Math.cos(r) * len, Math.sin(r) * len);
     }
     this.life = true;
     this.startTime = Date.now();
@@ -483,11 +497,13 @@ class Explosion {
     for (let i = 0; i < this.firePosition.length; i++) {
       let x = this.firePosition[i].x + d * this.fireVector[i].x;
       let y = this.firePosition[i].y + d * this.fireVector[i].y;
+      // 進捗に応じて大きさを変える
+      let scale = 1.0 - progress;
       this.ctx.fillRect(
-        x - this.fireSize / 2,
-        y - this.fireSize / 2,
-        this.fireSize,
-        this.fireSize
+        x - this.fireSize[i] * scale / 2,
+        y - this.fireSize[i] * scale / 2,
+        this.fireSize[i] * scale,
+        this.fireSize[i] * scale
       );
     }
     if (progress >= 1.0) this.life = false;
