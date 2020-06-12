@@ -64,11 +64,22 @@
       CANVAS_HEIGHT - 100
     );
 
+    // 敵キャラクターを初期化(ショットは共有する)
+    for (let i = 0; i < ENEMY_MAX_COUNT; i++) {
+      enemyArray[i] = new Enemy(ctx, 0, 0, 48, 48, "image/enemy_small.png");
+      enemyArray[i].setShotArray(enemyShotArray);
+    }
+
     // ショットを初期化
     for (let i = 0; i < SHOT_MAX_COUNT; i++) {
       shotArray[i] = new Shot(ctx, 0, 0, 32, 32, "image/viper_shot.png");
       singleShotArray[i * 2 + 0] = new Shot(ctx, 0, 0, 32, 32, "image/viper_single_shot.png");
       singleShotArray[i * 2 + 1] = new Shot(ctx, 0, 0, 32, 32, "image/viper_single_shot.png");
+
+      // 衝突判定の対象を設定
+      shotArray[i].setTargets(enemyArray);
+      singleShotArray[i * 2 + 0].setTargets(enemyArray);
+      singleShotArray[i * 2 + 1].setTargets(enemyArray);
     }
     viper.setShotArray(shotArray, singleShotArray);
 
@@ -77,11 +88,6 @@
       enemyShotArray[i] = new Shot(ctx, 0, 0, 32, 32, "image/enemy_shot.png");
     }
 
-    // 敵キャラクターを初期化(ショットは共有する)
-    for (let i = 0; i < ENEMY_MAX_COUNT; i++) {
-      enemyArray[i] = new Enemy(ctx, 0, 0, 48, 48, "image/enemy_small.png");
-      enemyArray[i].setShotArray(enemyShotArray);
-    }
 
   }
 
@@ -144,13 +150,13 @@
         // 敵を配置する
         for (let i = 0; i < ENEMY_MAX_COUNT; i++) if (enemyArray[i].life <= 0) {
           let enemy = enemyArray[i];
-          enemy.set(CANVAS_WIDTH / 2, -enemy.height);
+          enemy.set(CANVAS_WIDTH / 2, -enemy.height, 2, 'default');
           enemy.setDirection(0.0, 1.0);
           break;
         }
       }
       // 100フレームごとに再実行する
-      if (scene.frame === 10) {
+      if (scene.frame === 100) {
         scene.use('invade');
       }
     })

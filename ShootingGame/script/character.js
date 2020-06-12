@@ -11,6 +11,15 @@ class Position {
     if (x != null) this.x = x;
     if (y != null) this.y = y;
   }
+  /**
+   * 対象のPositionクラスのインスタンスとの距離を返す
+   * @param {Position} target 
+   */
+  distance(target) {
+    let dx = this.x - target.x;
+    let dy = this.y - target.y;
+    return Math.sqrt(dx * dx + dy * dy);
+  }
 }
 
 class Character {
@@ -158,7 +167,7 @@ class Viper extends Character {
     this.position.set(startX, startY);
     this.comingStartPosition = new Position(startX, startY);
     this.comingEndPosition = new Position(endX, endY);
-  } viperviper
+  }
 
   /**
    * ショットを設定する
@@ -206,6 +215,7 @@ class Viper extends Character {
 
         for (let i = 0; i < this.shotArray.length; i++) if (this.shotArray[i].life <= 0) {
           this.shotArray[i].set(this.position.x, this.position.y);
+          this.shotArray[i].setPower(2);
           // console.log(this.shotArray[i].position.x);
           break;
         }
@@ -233,6 +243,16 @@ class Shot extends Character {
   constructor(ctx, x, y, w, h, imagePath) {
     super(ctx, x, y, w, h, 0, imagePath);
     this.speed = 12;
+    /**
+     * 自身の攻撃力
+     * @type {number}
+     */
+    this.power = 1;
+    /**
+     * 衝突判定をする対象の配列
+     * @type {Array<Character>}
+     */
+    this.targetArray = [];
   }
 
   /**
@@ -257,6 +277,26 @@ class Shot extends Character {
     }
   }
 
+  /**
+   * ショットの攻撃力を設定する
+   * @param {*} power 
+   */
+  setPower(power) {
+    if (power != null && power > 0) {
+      this.power = power;
+    }
+  }
+
+  /**
+   * ショットが衝突判定を行う対象を設定する
+   * @param {Array<Character>} targets - 衝突判定の対象の配列
+   */
+  setTargets(targets) {
+    if (targets != null && Array.isArray(targets) === true && targets.length > 0) {
+      this.targetArray = targets;
+    }
+  }
+
   update() {
     // ライフが0以下の場合は描画しない
     if (this.life <= 0) return;
@@ -264,6 +304,19 @@ class Shot extends Character {
     this.position.x += this.speed * this.direction.x;
     this.position.y += this.speed * this.direction.y;
     this.rotationDraw();
+
+    // 対象と衝突判定を行う
+    this.targetArray.map((v) => {
+      if (v.life <= 0) return;
+
+      let dist = this.position.distance(v.position);
+      // 衝突判定をする(アバウト?)
+      if (dist <= (this.width + v.width) / 4) {
+        console.log('collision occured!');
+        v.life -= this.power;
+        this.life = 0;
+      }
+    });
 
     // 画面外に移動したらライフを0にする
     if (this.position.y + this.height < 0) this.life = 0;
