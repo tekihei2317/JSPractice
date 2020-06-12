@@ -20,6 +20,24 @@ class Position {
     let dy = this.y - target.y;
     return Math.sqrt(dx * dx + dy * dy);
   }
+  /**
+   * ベクトルの長さを返す
+   * @static
+   * @param {number} x 
+   * @param {number} y 
+   */
+  static calcLength(x, y) {
+    return Math.sqrt(x * x + y * y);
+  }
+  /**
+   * ベクトルを単位化して返す
+   * @param {number} x 
+   * @param {number} y 
+   */
+  static calcNormal(x, y) {
+    const len = Position.calcLength(x, y);
+    if (len !== 0) return new Position(x / len, y / len);
+  }
 }
 
 class Character {
@@ -380,6 +398,11 @@ class Enemy extends Character {
      * @type {Array<Shot>}
      */
     this.shotArray = null;
+    /**
+     * 自身の攻撃の対象
+     * @type {Character}
+     */
+    this.attackTarget = null;
   }
 
   /**
@@ -405,17 +428,39 @@ class Enemy extends Character {
     this.shotArray = shotArray;
   }
 
+  /**
+   * 攻撃対象を設定する
+   * @param {Character} target 
+   */
+  setAttackTarget(target) {
+    this.attackTarget = target;
+  }
+
   update() {
+    if (this.life <= 0) return;
     if (this.type === 'default') {
       // 配置から50フレーム後に発射する
       if (this.frame === 50) this.fire();
-      if (this.life <= 0) return;
-      // 画面外(下)に出ていたらライフを0にする
-      if (this.position.y - this.height / 2 > this.ctx.canvas.height) this.life = 0;
 
       // 位置を更新して描画する
       this.position.x += this.speed * this.direction.x;
       this.position.y += this.speed * this.direction.y;
+
+      // 画面外(下)に出ていたらライフを0にする
+      if (this.position.y - this.height / 2 > this.ctx.canvas.height) this.life = 0;
+    }
+    else if (this.type === 'wave') {
+      // 60フレームごとに発射する
+      if (this.frame % 60 === 0) {
+        let dx = this.attackTarget.position.x - this.position.x;
+        let dy = this.attackTarget.position.y - this.position.y;
+        let direction = Position.calcNormal(dx, dy);
+        this.fire(direction.x, direction.y);
+      }
+      this.position.x += Math.sin(this.frame / 10) * 3;
+      this.position.y += 2.0;
+
+      if (this.position.y - this.height / 2 > this.ctx.canvas.height) this.life = 0;
     }
     this.draw();
     this.frame++;
@@ -426,12 +471,12 @@ class Enemy extends Character {
    * @param {number} x - 進行方向ベクトルのx成分
    * @param {number} y - 進行方向ベクトルのy成分
    */
-  fire(x = 0.0, y = 1.0) {
+  fire(x = 0.0, y = 1.0, speed = 5.0) {
     console.log('enemy fired');
     for (let i = 0; i < this.shotArray.length; i++) if (this.shotArray[i].life <= 0) {
       this.shotArray[i].set(this.position.x, this.position.y);
-      this.shotArray[i].setSpeed(5.0);
       this.shotArray[i].setDirection(x, y);
+      this.shotArray[i].setSpeed(speed);
       break;
     }
   }
