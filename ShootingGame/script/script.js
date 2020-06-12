@@ -101,6 +101,9 @@
     enemyArray.map((v) => {
       ready = ready && v.ready;
     })
+    enemyShotArray.map((v) => {
+      ready = ready && v.ready;
+    })
 
     console.log(ready === true ? "ready" : "not ready");
     if (ready === true) {
@@ -175,6 +178,9 @@
     enemyArray.map((v) => {
       v.update();
     });
+    enemyShotArray.map((v) => {
+      v.update();
+    })
     requestAnimationFrame(render);
   }
 })();

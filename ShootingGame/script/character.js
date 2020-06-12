@@ -239,10 +239,22 @@ class Shot extends Character {
    * ショットを配置する
    * @param {number} x - x座標
    * @param {number} y - y座標
+   * @param {number} [speed] -　ショットの速さ
    */
-  set(x, y) {
+  set(x, y, speed) {
     this.position.set(x, y);
     this.life = 1;
+    this.setSpeed(speed);
+  }
+
+  /**
+   * ショットの速度を設定する
+   * @param {number} speed 
+   */
+  setSpeed(speed) {
+    if (speed != null && speed > 0) {
+      this.speed = speed;
+    }
   }
 
   update() {
@@ -261,6 +273,20 @@ class Shot extends Character {
 class Enemy extends Character {
   constructor(ctx, x, y, w, h, imagePath) {
     super(ctx, x, y, w, h, 0, imagePath);
+    /**
+     * 自身のタイプ
+     * @type {string}
+     */
+    this.type = 'default';
+    /**
+     * 自身が出現してからのフレーム数
+     * type {number}
+     */
+    this.frame = 0;
+    /**
+     * 自身の速さ
+     * type {number}
+     */
     this.speed = 3;
     /**
      * 自身が持つショットの配列
@@ -273,11 +299,15 @@ class Enemy extends Character {
    * 敵を配置する
    * @param {number} x 
    * @param {number} y 
-   * @param {number} life 
+   * @param {number} [life=1]
+   * @param {string} [type='default']
    */
-  set(x, y, life = 1) {
+  set(x, y, life = 1, type = 'default') {
     this.position.set(x, y);
     this.life = life;
+    this.type = type;
+    // フレームをリセットする
+    this.frame = 0;
   }
 
   /**
@@ -289,13 +319,33 @@ class Enemy extends Character {
   }
 
   update() {
-    if (this.life <= 0) return;
-    // 画面外(下)に出ていたらライフを0にする
-    if (this.position.y - this.height / 2 > this.ctx.canvas.height) this.life = 0;
+    if (this.type === 'default') {
+      // 配置から50フレーム後に発射する
+      if (this.frame === 50) this.fire();
+      if (this.life <= 0) return;
+      // 画面外(下)に出ていたらライフを0にする
+      if (this.position.y - this.height / 2 > this.ctx.canvas.height) this.life = 0;
 
-    // 位置を更新して描画する
-    this.position.x += this.speed * this.direction.x;
-    this.position.y += this.speed * this.direction.y;
+      // 位置を更新して描画する
+      this.position.x += this.speed * this.direction.x;
+      this.position.y += this.speed * this.direction.y;
+    }
     this.draw();
+    this.frame++;
+  }
+
+  /**
+   * 指定した方向にショットを撃つ
+   * @param {number} x - 進行方向ベクトルのx成分
+   * @param {number} y - 進行方向ベクトルのy成分
+   */
+  fire(x = 0.0, y = 1.0) {
+    console.log('enemy fired');
+    for (let i = 0; i < this.shotArray.length; i++) if (this.shotArray[i].life <= 0) {
+      this.shotArray[i].set(this.position.x, this.position.y);
+      this.shotArray[i].setSpeed(5.0);
+      this.shotArray[i].setDirection(x, y);
+      break;
+    }
   }
 }
