@@ -22,7 +22,7 @@
   let shotArray = [];
   let singleShotArray = [];
 
-  const ENEMY_COUNT = 10;
+  const ENEMY_MAX_COUNT = 10;
   let enemyArray = [];
 
   /**
@@ -44,7 +44,7 @@
   });
 
   /**
-   * Canvasを初期化する
+   * Canvasとキャラクターを初期化する
    */
   function initialize() {
     canvas.width = CANVAS_WIDTH;
@@ -71,7 +71,7 @@
     viper.setShotArray(shotArray, singleShotArray);
 
     // 敵キャラクターを初期化
-    for (let i = 0; i < ENEMY_COUNT; i++) {
+    for (let i = 0; i < ENEMY_MAX_COUNT; i++) {
       enemyArray[i] = new Enemy(ctx, 0, 0, 48, 48, "image/enemy_small.png");
     }
   }
@@ -121,6 +121,7 @@
     scene.add('intro', (time) => {
       if (time > 2.0) {
         scene.use('invade');
+        console.log('using invade scene');
       }
     });
 
@@ -131,14 +132,14 @@
       // 敵を配置する
       for (let i = 0; i < ENEMY_MAX_COUNT; i++) if (enemyArray[i].life <= 0) {
         let enemy = enemyArray[i];
-        enemyArray.set(canvas_WIDTH / 2, -enemy.height);
-        enemy.setVector(0.0, 1.0);
+        enemy.set(CANVAS_WIDTH / 2, -enemy.height);
+        enemy.setDirection(0.0, 1.0);
         break;
       }
     })
     // 最初はintroシーンを設定する
     scene.use('intro');
-
+    console.log('using intro scene');
   }
 
   /**
@@ -148,16 +149,18 @@
     // 描画前に全体をグレーで塗りつぶす
     util.drawRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT, "#eee");
 
+    scene.update();
+
     viper.update();
     shotArray.map((v) => {
       v.update();
     });
     singleShotArray.map((v) => {
       v.update();
-    })
+    });
     enemyArray.map((v) => {
       v.update();
-    })
+    });
     requestAnimationFrame(render);
   }
 })();

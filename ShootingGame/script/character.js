@@ -75,6 +75,14 @@ class Character {
   }
 
   /**
+   * 進行方向を設定する
+   * @param {number} x - x成分
+   * @param {number} y - y成分
+   */
+  setDirection(x, y) {
+    this.direction.set(x, y);
+  }
+  /**
    * キャラクターの角度(ラジアン)と方向を設定する
    * @param {number} rad  
    */
@@ -270,7 +278,7 @@ class Enemy extends Character {
   update() {
     if (this.life <= 0) return;
     // 画面外(下)に出ていたらライフを0にする
-    if (this.position.y - this.height / 2 > this.canvas.ctx.height) life = 0;
+    if (this.position.y - this.height / 2 > this.ctx.canvas.height) this.life = 0;
 
     // 位置を更新して描画する
     this.position.x += this.speed * this.direction.x;

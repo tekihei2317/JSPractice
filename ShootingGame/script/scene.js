@@ -32,7 +32,7 @@ class SceneManager {
     this.scene[name] = updateFunction;
   }
 
-  use(scene) {
+  use(name) {
     // 指定されたシーンが存在しない場合は終了する
     if (this.scene.hasOwnProperty(name) !== true) return;
 
@@ -46,5 +46,6 @@ class SceneManager {
     // 経過時間を引数に与えて処理を行う
     this.activeScene(activeTime);
     this.frame++;
+    // console.log(this.frame);
   }
 }
