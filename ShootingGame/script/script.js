@@ -76,7 +76,7 @@
 
     // 爆発エフェクトを初期化
     for (let i = 0; i < EXPLOSION_MAX_COUNT; i++) {
-      explosionArray[i] = new Explosion(ctx, 50, 15, 30, 0.25);
+      explosionArray[i] = new Explosion(ctx, 100, 15, 40, 1.0);
     }
 
     // ショットを初期化

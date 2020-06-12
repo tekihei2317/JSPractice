@@ -491,14 +491,15 @@ class Explosion {
     this.ctx.globalAlpha = 0.5;
 
     let time = (Date.now() - this.startTime) / 1000;
-    let progress = Math.min(time / this.timeRange, 1.0);
+    let progress = simpleEaseOut(Math.min(time / this.timeRange), 1.0);
+
     let d = this.radius * progress;
 
     for (let i = 0; i < this.firePosition.length; i++) {
       let x = this.firePosition[i].x + d * this.fireVector[i].x;
       let y = this.firePosition[i].y + d * this.fireVector[i].y;
       // 進捗に応じて大きさを変える
-      let scale = 1.0 - progress;
+      let scale = 1 - progress;
       this.ctx.fillRect(
         x - this.fireSize[i] * scale / 2,
         y - this.fireSize[i] * scale / 2,
@@ -508,4 +509,12 @@ class Explosion {
     }
     if (progress >= 1.0) this.life = false;
   }
+}
+
+function simpleEaseIn(t) {
+  return t * t * t * t;
+}
+
+function simpleEaseOut(t) {
+  return 1 - simpleEaseIn(1 - t);
 }
