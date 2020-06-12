@@ -22,6 +22,9 @@
   let shotArray = [];
   let singleShotArray = [];
 
+  const ENEMY_COUNT = 10;
+  let enemyArray = [];
+
   /**
    * ページのロード完了時に実行
    */
@@ -41,6 +44,7 @@
     canvas.width = CANVAS_WIDTH;
     canvas.height = CANVAS_HEIGHT;
 
+    // 自機を初期化
     viper = new Viper(ctx, 0, 0, 64, 64, "image/viper.png");
     viper.setComingScene(
       CANVAS_WIDTH / 2,
@@ -49,16 +53,22 @@
       CANVAS_HEIGHT - 100
     );
 
+    // ショットを初期化
     for (let i = 0; i < SHOT_MAX_COUNT; i++) {
       shotArray[i] = new Shot(ctx, 0, 0, 32, 32, "image/viper_shot.png");
       singleShotArray[i * 2 + 0] = new Shot(ctx, 0, 0, 32, 32, "image/viper_single_shot.png");
       singleShotArray[i * 2 + 1] = new Shot(ctx, 0, 0, 32, 32, "image/viper_single_shot.png");
     }
     viper.setShotArray(shotArray, singleShotArray);
+
+    // 敵キャラクターを初期化
+    for (let i = 0; i < ENEMY_COUNT; i++) {
+      enemyArray[i] = new Enemy(ctx, 0, 0, 48, 48, "image/enemy_small.png");
+    }
   }
 
   /**
-   * ロードが完了したら描画を開始する
+   * ロード完了したかチェックし、完了したら描画を開始する
    */
   function startGame() {
     let ready = true;
@@ -70,6 +80,9 @@
     singleShotArray.map((v) => {
       ready = ready && v.ready;
     });
+    enemyArray.map((v) => {
+      ready = ready && v.ready;
+    })
 
     console.log(ready === true ? "ready" : "not ready");
     if (ready === true) {
@@ -106,6 +119,9 @@
       v.update();
     });
     singleShotArray.map((v) => {
+      v.update();
+    })
+    enemyArray.map((v) => {
       v.update();
     })
     requestAnimationFrame(render);

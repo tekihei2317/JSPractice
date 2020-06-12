@@ -37,7 +37,7 @@ class Character {
      */
     this.angle = 270 * Math.PI / 180;
     /**
-     * 進行方向を表すベクトル
+     * 進行方向を表す単位ベクトル
      * @type {Position}
      */
     this.direction = new Position(0, -1.0);
@@ -247,5 +247,34 @@ class Shot extends Character {
 
     // 画面外に移動したらライフを0にする
     if (this.position.y + this.height < 0) this.life = 0;
+  }
+}
+
+class Enemy extends Character {
+  constructor(ctx, x, y, w, h, imagePath) {
+    super(ctx, x, y, w, h, 0, imagePath);
+    this.speed = 3;
+  }
+
+  /**
+   * 敵を配置する
+   * @param {number} x 
+   * @param {number} y 
+   * @param {number} life 
+   */
+  set(x, y, life = 1) {
+    this.position.set(x, y);
+    this.life = life;
+  }
+
+  update() {
+    if (this.life <= 0) return;
+    // 画面外(下)に出ていたらライフを0にする
+    if (this.position.y - this.height / 2 > this.canvas.ctx.height) life = 0;
+
+    // 位置を更新して描画する
+    this.position.x += this.speed * this.direction.x;
+    this.position.y += this.speed * this.direction.y;
+    this.draw();
   }
 }
