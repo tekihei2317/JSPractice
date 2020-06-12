@@ -162,7 +162,7 @@ class Viper extends Character {
    * @param {number} endY 
    */
   setComingScene(startX, startY, endX, endY) {
-    this.life = 1;
+    this.life = 3;
     this.isComing = true;
     this.comingStartTime = Date.now();
     this.position.set(startX, startY);

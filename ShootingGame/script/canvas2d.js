@@ -19,11 +19,17 @@ class Canvas2DUtility {
     if (color != null) this.context2d.fillStyle = color;
     this.context2d.fillRect(x, y, width, height);
   }
+
   imageLoader(path, callback) {
     let target = new Image();
     target.addEventListener("load", () => {
       if (callback != null) callback(target);
     });
     target.src = path;
+  }
+
+  drawText(text, x, y, color, width) {
+    if (color != null) this.context2d.fillStyle = color;
+    this.context2d.fillText(text, x, y, width);
   }
 }

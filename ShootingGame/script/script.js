@@ -38,6 +38,12 @@
   let explosionArray = [];
 
   /**
+   * 再スタートするためのフラグ
+   * type {boolean}
+   */
+  let restart = false;
+
+  /**
    * ページのロード完了時に実行
    */
   window.addEventListener("load", () => {
@@ -142,6 +148,7 @@
   function eventSetting() {
     window.addEventListener("keydown", (event) => {
       isKeyDown[`key_${event.key}`] = true;
+      if (event.key === 'Enter' && viper.life <= 0) restart = true;
     });
     window.addEventListener("keyup", (event) => {
       isKeyDown[`key_${event.key}`] = false;
@@ -172,6 +179,30 @@
       // 100フレームごとに再実行する
       if (scene.frame === 100) {
         scene.use('invade');
+      }
+      if (viper.life <= 0) {
+        scene.use('gameover');
+      }
+    });
+
+    // gameoverシーン
+    scene.add('gameover', (time) => {
+      let textWidth = CANVAS_WIDTH / 2;
+      let loopWidth = CANVAS_WIDTH + textWidth;
+      let x = CANVAS_WIDTH - (scene.frame * 2) % loopWidth;
+      ctx.font = 'bold 72px sans-serif';
+      util.drawText('GAME OVER', x, CANVAS_HEIGHT / 2, '#ff0000', textWidth);
+
+      // 再スタートの処理
+      if (restart === true) {
+        restart = false;
+        viper.setComingScene(
+          CANVAS_WIDTH / 2,
+          CANVAS_HEIGHT,
+          CANVAS_WIDTH / 2,
+          CANVAS_HEIGHT - 100
+        );
+        scene.use('intro');
       }
     })
     // 最初はintroシーンを設定する
