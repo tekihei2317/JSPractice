@@ -28,6 +28,14 @@ class Canvas2DUtility {
     target.src = path;
   }
 
+  /**
+   * テキストを描画する
+   * @param {string} text 
+   * @param {number} x 
+   * @param {number} y 
+   * @param {string} color 
+   * @param {number} width 
+   */
   drawText(text, x, y, color, width) {
     if (color != null) this.context2d.fillStyle = color;
     this.context2d.fillText(text, x, y, width);

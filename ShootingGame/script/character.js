@@ -327,11 +327,11 @@ class Shot extends Character {
       if (v.life <= 0) return;
 
       let dist = this.position.distance(v.position);
-      // 衝突判定をする(アバウト?)
+      // 衝突判定をする(易しめ)
       if (dist <= (this.width + v.width) / 4) {
         console.log('collision occured!');
         if (v instanceof Viper === true) {
-          // 登場シーンの場合は衝突判定を行わないz
+          // 登場シーンの場合は衝突判定を行わない
           if (v.isComing === true) return;
         }
         v.life -= this.power;
@@ -340,6 +340,11 @@ class Shot extends Character {
           for (let i = 0; i < this.explosionArray.length; i++) if (this.explosionArray[i].life !== true) {
             this.explosionArray[i].set(v.position.x, v.position.y);
             break;
+          }
+          // スコアを加算する
+          if (v instanceof Enemy === true) {
+            gameScore = Math.min(gameScore + 100, 99999);
+            console.log(gameScore);
           }
         }
         this.life = 0;

@@ -18,10 +18,12 @@
 
   let viper = null;
 
+  // 自機が放つショット
   const SHOT_MAX_COUNT = 10;
   let shotArray = [];
   let singleShotArray = [];
 
+  // 敵
   const ENEMY_MAX_COUNT = 10;
   const ENEMY_SHOT_MAX_COUNT = 50;
   let enemyArray = [];
@@ -42,6 +44,12 @@
    * type {boolean}
    */
   let restart = false;
+
+  /**
+   * ゲームのスコア
+   * @type {number}
+   */
+  window.gameScore = 0;
 
   /**
    * ページのロード完了時に実行
@@ -196,6 +204,7 @@
       // 再スタートの処理
       if (restart === true) {
         restart = false;
+        gameScore = 0;
         viper.setComingScene(
           CANVAS_WIDTH / 2,
           CANVAS_HEIGHT,
@@ -215,8 +224,13 @@
    */
   function render() {
     ctx.globalAlpha = 1.0;
+
     // 描画前に全体をグレーで塗りつぶす
     util.drawRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT, "#eee");
+
+    // スコアの表示
+    ctx.font = 'bold 24px monospace';
+    util.drawText(String(gameScore).padStart(5, '0'), 30, 50, '#111111');
 
     scene.update();
     viper.update();
