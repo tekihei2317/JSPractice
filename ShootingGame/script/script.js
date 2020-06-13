@@ -200,21 +200,15 @@
     // gameoverシーン
     scene.add('gameover', (time) => {
       let textWidth = CANVAS_WIDTH / 2;
-      let loopWidth = CANVAS_WIDTH + textWidth;
-      let x = CANVAS_WIDTH - (scene.frame * 2) % loopWidth;
+      let x = Math.max(CANVAS_WIDTH - scene.frame * 3, CANVAS_WIDTH / 2 - textWidth / 2);
       ctx.font = 'bold 72px sans-serif';
-      util.drawText('GAME OVER', x, CANVAS_HEIGHT / 2, '#ff0000', textWidth);
+      util.drawText('GAME OVER', x, CANVAS_HEIGHT / 2, '#222222', textWidth);
 
       // 再スタートの処理
       if (restart === true) {
         restart = false;
         gameScore = 0;
-        viper.setComingScene(
-          CANVAS_WIDTH / 2,
-          CANVAS_HEIGHT,
-          CANVAS_WIDTH / 2,
-          CANVAS_HEIGHT - 100
-        );
+        viper.setComingScene(CANVAS_WIDTH / 2, ANVAS_HEIGHT, CANVAS_WIDTH / 2, CANVAS_HEIGHT - 100);
         scene.use('intro');
       }
     })

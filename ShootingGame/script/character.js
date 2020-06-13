@@ -470,6 +470,7 @@ class Enemy extends Character {
    * 指定した方向にショットを撃つ
    * @param {number} x - 進行方向ベクトルのx成分
    * @param {number} y - 進行方向ベクトルのy成分
+   * @param {number} speed - ショットの速さ
    */
   fire(x = 0.0, y = 1.0, speed = 5.0) {
     console.log('enemy fired');
