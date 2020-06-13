@@ -332,6 +332,9 @@ class Shot extends Character {
     }
   }
 
+  /**
+   * 位置を更新する
+   */
   update() {
     // ライフが0以下の場合は描画しない(無視する)
     if (this.life <= 0) return;
@@ -348,10 +351,7 @@ class Shot extends Character {
       // 衝突判定をする(易しめ)
       if (dist <= (this.width + v.width) / 4) {
         console.log('collision occured!');
-        if (v instanceof Viper === true) {
-          // 登場シーンの場合は衝突判定を行わない
-          if (v.isComing === true) return;
-        }
+
         v.life -= this.power;
         // ライフが0以下になったら爆発エフェクトを生成する
         if (v.life <= 0) {
@@ -372,8 +372,17 @@ class Shot extends Character {
     });
 
     // 画面外に移動したらライフを0にする
-    if (this.position.y + this.height < 0) this.life = 0;
-    if (this.position.y - this.height > this.ctx.canvas.height) this.life = 0;
+    if (this.outOfRange() === true) this.life = 0;
+  }
+
+  /**
+   * 画面外に出ているか判定する
+   */
+  outOfRange() {
+    return (
+      this.position.x + this.width < 0 || this.position.x - this.width > this.ctx.canvas.width ||
+      this.position.y + this.height < 0 || this.position.y - this.height > this.ctx.canvas.height
+    );
   }
 }
 
