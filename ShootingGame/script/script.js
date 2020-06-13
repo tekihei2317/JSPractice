@@ -24,7 +24,8 @@
   let singleShotArray = [];
 
   // 敵
-  const ENEMY_MAX_COUNT = 10;
+  const ENEMY_SMALL_MAX_COUNT = 15;
+  const ENEMY_LARGE_MAX_COUNT = 5;
   const ENEMY_SHOT_MAX_COUNT = 50;
   let enemyArray = [];
   let enemyShotArray = [];
@@ -67,6 +68,8 @@
    * Canvasとキャラクターを初期化する
    */
   function initialize() {
+    console.log('start initializing...');
+
     canvas.width = CANVAS_WIDTH;
     canvas.height = CANVAS_HEIGHT;
 
@@ -82,10 +85,18 @@
       CANVAS_HEIGHT - 100
     );
 
-    // 敵キャラクターを初期化(ショットは共有する)
-    for (let i = 0; i < ENEMY_MAX_COUNT; i++) {
-      enemyArray[i] = new Enemy(ctx, 0, 0, 48, 48, "image/enemy_large.png");
+    // 敵キャラクター(小)を初期化
+    for (let i = 0; i < ENEMY_SMALL_MAX_COUNT; i++) {
+      enemyArray[i] = new Enemy(ctx, 0, 0, 32, 32, "image/enemy_small.png");
       enemyArray[i].setShotArray(enemyShotArray);
+      enemyArray[i].setAttackTarget(viper);
+    }
+
+    // 敵キャラクター(大)を初期化
+    for (i = 0; i < ENEMY_LARGE_MAX_COUNT; i++) {
+      enemyArray[ENEMY_SMALL_MAX_COUNT + i] = new Enemy(ctx, 0, 0, 48, 48, "image/enemy_large.png");
+      enemyArray[ENEMY_SMALL_MAX_COUNT + i].setShotArray(enemyShotArray);
+      enemyArray[ENEMY_SMALL_MAX_COUNT + i].setAttackTarget(viper);
     }
 
     // 爆発エフェクトを初期化
@@ -117,6 +128,7 @@
       enemyShotArray[i].setTargets([viper]);
       enemyShotArray[i].setExplosions(explosionArray);
     }
+    console.log('initializing finished!');
   }
 
   /**
@@ -134,10 +146,10 @@
     });
     enemyArray.map((v) => {
       ready = ready && v.ready;
-    })
+    });
     enemyShotArray.map((v) => {
       ready = ready && v.ready;
-    })
+    });
 
     console.log(ready === true ? "ready" : "not ready");
     if (ready === true) {
@@ -170,27 +182,28 @@
     // イントロシーン
     scene.add('intro', (time) => {
       if (time > 2.0) {
-        scene.use('invade');
-        console.log('switch to invade scene');
+        scene.use('invade_default_type');
+        console.log('switch to invade default type scene');
       }
     });
 
     // invadeシーン
-    scene.add('invade', (time) => {
+    scene.add('invade_default_type', (time) => {
       // console.log(scene.frame);
-      if (scene.frame === 0) {
+      if (scene.frame % 30 === 0) {
         // 敵を配置する
-        for (let i = 0; i < ENEMY_MAX_COUNT; i++) if (enemyArray[i].life <= 0) {
+        for (let i = 0; i < ENEMY_SMALL_MAX_COUNT; i++) if (enemyArray[i].life <= 0) {
           let enemy = enemyArray[i];
-          enemy.set(CANVAS_WIDTH * (1 / 6) + CANVAS_WIDTH * (2 / 3) * Math.random(), -enemy.height, 10, 'large');
-          enemy.setDirection(0.0, 1.0);
-          enemy.setAttackTarget(viper);
+          // 左右から交互に出現させる
+          if (scene.frame % 60 === 0) {
+            enemy.set(-enemy.width, 30, 2, 'default');
+            enemy.setAngleAndDirection(30 * Math.PI / 180);
+          } else {
+            enemy.set(CANVAS_WIDTH + enemy.width, 30, 2, 'default');
+            enemy.setAngleAndDirection(150 * Math.PI / 180);
+          }
           break;
         }
-      }
-      // 100フレームごとに再実行する
-      if (scene.frame === 100) {
-        scene.use('invade');
       }
       if (viper.life <= 0) {
         scene.use('gameover');
