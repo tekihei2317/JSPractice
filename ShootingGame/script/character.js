@@ -361,7 +361,9 @@ class Shot extends Character {
           }
           // スコアを加算する
           if (v instanceof Enemy === true) {
-            gameScore = Math.min(gameScore + 100, 99999);
+            let score = 100;
+            if (v.type === 'large') score = 1000;
+            gameScore = Math.min(gameScore + score, 99999);
             console.log(gameScore);
           }
         }
@@ -451,16 +453,27 @@ class Enemy extends Character {
     }
     else if (this.type === 'wave') {
       // 60フレームごとに発射する
-      if (this.frame % 60 === 0) {
+      if (this.frame % 20 === 0) {
         let dx = this.attackTarget.position.x - this.position.x;
         let dy = this.attackTarget.position.y - this.position.y;
         let direction = Position.calcNormal(dx, dy);
-        this.fire(direction.x, direction.y);
+        this.fire(direction.x, direction.y, 4.0);
       }
       this.position.x += Math.sin(this.frame / 10) * 3;
       this.position.y += 2.0;
 
       if (this.position.y - this.height / 2 > this.ctx.canvas.height) this.life = 0;
+    }
+    else if (this.type === 'large') {
+      // 50フレームごとに全方位に発射する
+      if (this.frame % 50 === 0) {
+        for (let i = 0; i < 360; i += 45) {
+          const r = i * Math.PI / 180;
+          this.fire(Math.cos(r), Math.sin(r), 3.0);
+        }
+      }
+      this.position.x += Math.cos(this.frame / 50) * 2.0;
+      this.position.y += 1.0;
     }
     this.draw();
     this.frame++;

@@ -84,7 +84,7 @@
 
     // 敵キャラクターを初期化(ショットは共有する)
     for (let i = 0; i < ENEMY_MAX_COUNT; i++) {
-      enemyArray[i] = new Enemy(ctx, 0, 0, 48, 48, "image/enemy_small.png");
+      enemyArray[i] = new Enemy(ctx, 0, 0, 48, 48, "image/enemy_large.png");
       enemyArray[i].setShotArray(enemyShotArray);
     }
 
@@ -182,7 +182,7 @@
         // 敵を配置する
         for (let i = 0; i < ENEMY_MAX_COUNT; i++) if (enemyArray[i].life <= 0) {
           let enemy = enemyArray[i];
-          enemy.set(CANVAS_WIDTH * (1 / 6) + CANVAS_WIDTH * (2 / 3) * Math.random(), -enemy.height, 2, 'wave');
+          enemy.set(CANVAS_WIDTH * (1 / 6) + CANVAS_WIDTH * (2 / 3) * Math.random(), -enemy.height, 10, 'large');
           enemy.setDirection(0.0, 1.0);
           enemy.setAttackTarget(viper);
           break;
