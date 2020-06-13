@@ -230,7 +230,22 @@
           break;
         }
       }
-      if (scene.frame === 450) scene.use('invade_default_type');
+      if (scene.frame === 450) scene.use('invade_large_type');
+      if (viper.life <= 0) scene.use('gameover');
+    });
+
+    // invadeシーン(largeタイプの敵を生成)
+    scene.add('invade_large_type', (time) => {
+      if (scene.frame === 100) {
+        const l = ENEMY_SMALL_MAX_COUNT;
+        const r = ENEMY_SMALL_MAX_COUNT + ENEMY_LARGE_MAX_COUNT;
+        for (let i = l; i < r; i++) if (enemyArray[i].life <= 0) {
+          let enemy = enemyArray[i];
+          enemy.set(CANVAS_WIDTH / 2, -enemy.height, 30, 'large');
+          break;
+        }
+      }
+      if (scene.frame === 500) scene.use('intro');
       if (viper.life <= 0) scene.use('gameover');
     });
 
@@ -248,7 +263,8 @@
         viper.setComingScene(CANVAS_WIDTH / 2, ANVAS_HEIGHT, CANVAS_WIDTH / 2, CANVAS_HEIGHT - 100);
         scene.use('intro');
       }
-    })
+    });
+
     // 最初はintroシーンを設定する
     scene.use('intro');
     console.log('switch to intro scene');
