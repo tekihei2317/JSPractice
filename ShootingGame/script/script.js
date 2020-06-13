@@ -187,7 +187,7 @@
       }
     });
 
-    // invadeシーン
+    // invadeシーン(defaultタイプの敵を生成)
     scene.add('invade_default_type', (time) => {
       // console.log(scene.frame);
       if (scene.frame % 30 === 0) {
@@ -205,9 +205,33 @@
           break;
         }
       }
-      if (viper.life <= 0) {
-        scene.use('gameover');
+      if (scene.frame === 270) scene.use('blank');
+
+      if (viper.life <= 0) scene.use('gameover');
+    });
+
+    // 間隔調整のためのシーン
+    scene.add('blank', (time) => {
+      if (scene.frame === 150) scene.use('invade_wave_type');
+      if (viper.life <= 0) scene.use('gameover');
+    });
+
+    // invadeシーン(waveタイプの敵を生成)
+    scene.add('invade_wave_type', (time) => {
+      if (scene.frame % 50 === 0) {
+        for (let i = 0; i < ENEMY_SMALL_MAX_COUNT; i++) if (enemyArray[i].life <= 0) {
+          let enemy = enemyArray[i];
+          // 5体ずつ左右から出現させる
+          if (scene.frame <= 200) {
+            enemy.set(CANVAS_WIDTH * 0.2, -enemy.height, 2, 'wave');
+          } else {
+            enemy.set(CANVAS_WIDTH * 0.8, -enemy.height, 2, 'wave');
+          }
+          break;
+        }
       }
+      if (scene.frame === 450) scene.use('invade_default_type');
+      if (viper.life <= 0) scene.use('gameover');
     });
 
     // gameoverシーン

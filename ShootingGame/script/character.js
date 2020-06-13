@@ -462,7 +462,7 @@ class Enemy extends Character {
     }
     else if (this.type === 'wave') {
       // 60フレームごとに発射する
-      if (this.frame % 20 === 0) {
+      if (this.frame % 60 === 0) {
         let dx = this.attackTarget.position.x - this.position.x;
         let dy = this.attackTarget.position.y - this.position.y;
         let direction = Position.calcNormal(dx, dy);
